@@ -1,0 +1,29 @@
+name: Daily_Paper_with_Telegram_and_Notion
+on:
+  schedule:
+    - cron: '30 3 * * 1-5'
+  workflow_dispatch:
+  
+jobs:
+  send_telegram_save_notion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Run email script
+        env:
+          BOT_TOKEN : ${{ secrets.BOT_TOKEN }}
+          CHAT_ID : ${{ secrets.CHAT_ID }}
+          PROMPT_1 : ${{ secrets.PROMPT_1 }}
+          PROMPT_2 : ${{ secrets.PROMPT_2 }}
+        run: python main.py
