@@ -1,6 +1,7 @@
 import requests
 import time
 import os
+from dotenv import load_dotenv
 
 # 포맷팅
 def format_result(idx, date, item):
@@ -39,6 +40,7 @@ def prepare_msg(date, summarize):
 
 # 메시지 전송
 def send_telegram_msg(date, summarize):
+    load_dotenv()
     body = prepare_msg(date, summarize)
     
     BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -53,4 +55,3 @@ def send_telegram_msg(date, summarize):
         }
         response=requests.post(url, data=payload)
         time.sleep(1)
-    
