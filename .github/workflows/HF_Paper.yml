@@ -1,11 +1,11 @@
-name: Daily_Paper_with_Telegram_and_Notion
+name: Daily_Paper_with_Telegram
 on:
   schedule:
     - cron: '30 3 * * 1-5'
   workflow_dispatch:
   
 jobs:
-  send_telegram_save_notion:
+  send_telegram:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
