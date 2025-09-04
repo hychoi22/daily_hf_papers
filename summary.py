@@ -97,8 +97,8 @@ def summarize_with_llm(papers):
     }
     
     # 요약 및 번역
-    repo_id_1 = "Qwen/Qwen3-1.7B-GGUF"
-    file_name_1 = "Qwen3-1.7B-Q8_0.gguf"
+    repo_id_1 = "Qwen/Qwen3-4B-GGUF"
+    file_name_1 = "Qwen3-4B-Q8_0.gguf"
     
     llm1 = Llama.from_pretrained(
         repo_id=repo_id_1,
@@ -111,7 +111,7 @@ def summarize_with_llm(papers):
     
     for idx, (key, content) in enumerate(papers.items(),1):
         output1 = generate_response(llm1, PROMPT_1, content)
-        print(f"{idx}>>", output1)
+        # print(f"{idx}>>", output1)
         temp[key] = output1
     
     # 첫 번째 모델 해제
