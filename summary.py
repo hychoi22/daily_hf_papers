@@ -23,7 +23,7 @@ def generate_response(llm, PROMPT, content):
     
     msg = [
             {"role": "system", "content":PROMPT},
-            {"role": "user", "content": f"Please read the following text and provide a one-sentence summary in Korean: {content}"}
+            {"role": "user", "content": f"아래 영어 논문을 한국어 한문장으로 요약해줘.\ntext:\n {content}"}
         ]
     
     output = llm.create_chat_completion(
@@ -40,7 +40,7 @@ def generate_response(llm, PROMPT, content):
         content, flag = valid_response(result)
         if flag:
             break
-        print("답변 정제 시작 >> ", result)
+        # print("답변 정제 시작 >> ", result)
         msg = [
             {"role": "user", "content": content}
         ]
