@@ -7,23 +7,54 @@ def valid_response(text):
     korean_pattern = re.compile(r"[가-힣]")
     foreign_pattern = re.compile(r'[ひらがなカタカナ]|[ぁ-ゔ]|[ァ-ヾ]|[\u4e00-\u9fff\u3400-\u4dbf]')
     
-    # <think> 태그  처리
+    # <think> 태그 처리
     if "<think>" in text:
-        msg = f"Provide only the essential information in one line to Korean: {text}"
+        msg = f"불필요한 추론 과정을 제거하고, 아래 논문의 핵심 내용만 한국어 한 문장으로 요약해줘:\n {text}"
         return msg, False
     else:
-        if bool(korean_pattern.search(text)):
-            if not bool(foreign_pattern.search(text)):
-                return msg, True
-        msg = f"Translate to Korean. Remove all Chinese characters and Japanese characters. Keep English words and numbers unchanged: {text}"
+        if bool(korean_pattern.search(text)) and not bool(foreign_pattern.search(text)):
+            return msg, True
+        msg = f"아래 논문을 한국어로 번역해줘. 중국어나 일본어 문자는 모두 제거하고, 영어 단어와 숫자는 그대로 유지해줘:\n {text}"
     return msg, False
+
+
+def postprocess_response(llm, text, max_retry=3):
+
+    gen_kwargs = {
+        "max_tokens": 1024,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "repeat_penalty": 1.15, 
+        "stream": False,
+    }
+
+    result = (text.split("</think>")[-1]).strip()
+
+    retry = 0
+    while retry <= max_retry:
+        reask_msg, is_valid = valid_response(result)
+        if is_valid:
+            return result 
+
+        if retry == max_retry:
+            return None 
+
+        out = llm.create_chat_completion(
+            messages=[{"role": "user", "content": reask_msg}],
+            **gen_kwargs,
+        )
+        result = (out["choices"][0]["message"]["content"]).split("</think>")[-1].strip()
+        retry += 1
+
+    return None
+
 
 # LLM 모델 답변 생성
 def generate_response(llm, PROMPT, content):
     
     msg = [
             {"role": "system", "content":PROMPT},
-            {"role": "user", "content": f"아래 영어 논문을 한국어 한문장으로 요약해줘.\n {content}"}
+            {"role": "user", "content": f"아래 영어 논문을 한국어 한 문장으로 간결하게 요약해줘.\n {content}"}
         ]
     
     output = llm.create_chat_completion(
@@ -31,33 +62,13 @@ def generate_response(llm, PROMPT, content):
             max_tokens=1024,
             temperature=0.7,
             top_p=0.9,
+            repeat_penalty=1.15,
             stream=False
         )
-    result = (output['choices'][0]['message']['content']).split("</think>")[-1].strip()
+    first_rsp = (output['choices'][0]['message']['content']).split("</think>")[-1].strip()
     
-    MAX_RETRY = 3
-    while MAX_RETRY>0:
-        content, flag = valid_response(result)
-        if flag:
-            break
-        # print("답변 정제 시작 >> ", result)
-        msg = [
-            {"role": "user", "content": content}
-        ]
-        output = llm.create_chat_completion(
-            messages = msg,
-            max_tokens = 1024,
-            temperature = 0.7,
-            top_p = 0.9,
-            stream = False
-        )
-        result = (output['choices'][0]['message']['content']).split("</think>")[-1].strip()
-        MAX_RETRY -= 1
     
-    if not flag:
-        result = None
-    
-    return result
+    return postprocess_response(llm, first_rsp)
 
 
 # LLM 모델 도메인 분류
