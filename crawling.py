@@ -38,9 +38,13 @@ def crawling_data():
         soup = BeautifulSoup(content.text, "html.parser")
         
         # 내용 추출
-        title = soup.find("h1", class_="mb-2 text-2xl font-semibold sm:text-3xl lg:pr-6 lg:text-3xl xl:pr-10 2xl:text-4xl").text.replace("\n ","")
-        abstract = soup.find("p", class_="text-gray-600").text
-        papers[(title, full_url)] = abstract
+        try:
+            title = soup.find("h1", class_="mb-2 text-2xl font-semibold sm:text-3xl lg:pr-6 lg:text-3xl xl:pr-10 2xl:text-4xl").text.replace("\n ","")
+            abstract = soup.find("p", class_="text-gray-600").text
+            papers[(title, full_url)] = abstract
+        except Exception as e:
+            print(f"Error: {e}")
+            continue
     print(papers, len(papers))
     
     return papers, date
