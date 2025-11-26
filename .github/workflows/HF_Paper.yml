@@ -20,8 +20,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Run email script
+      - name: Run summary process
         env:
+          GEMINI_API_KEY : ${{ secrets.GEMINI_API_KEY }}
           BOT_TOKEN : ${{ secrets.BOT_TOKEN }}
           CHAT_ID : ${{ secrets.CHAT_ID }}
           PROMPT_1 : ${{ secrets.PROMPT_1 }}
