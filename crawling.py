@@ -30,7 +30,7 @@ def crawling_data():
     print(f"{date} 페이퍼 개수 : {len(today_papers_list)}개")
 
     papers = {}
-    for paper in today_papers_list:
+    for paper in today_papers_list[:20]:
         link = paper.a.get("href")
         full_url = base_url+link
         
