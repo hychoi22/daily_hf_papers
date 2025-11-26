@@ -31,10 +31,10 @@ graph TD
     G -->|Send Message| H[Telegram Channel]
 
     %% Styling
-    classDef trigger fill:#FF9A8B,stroke:#333,stroke-width:2px,color:black,rx:10,ry:10;
-    classDef script fill:#85FFBD,stroke:#333,stroke-width:2px,color:black,rx:5,ry:5;
-    classDef external fill:#FFCC70,stroke:#333,stroke-width:2px,color:black,rx:10,ry:10;
-    classDef output fill:#8EC5FC,stroke:#333,stroke-width:2px,color:black,rx:10,ry:10;
+    classDef trigger fill:#FF9A8B,stroke:#333,stroke-width:2px,color:black;
+    classDef script fill:#85FFBD,stroke:#333,stroke-width:2px,color:black;
+    classDef external fill:#FFCC70,stroke:#333,stroke-width:2px,color:black;
+    classDef output fill:#8EC5FC,stroke:#333,stroke-width:2px,color:black;
 
     class A trigger;
     class B,C,E,G script;
