@@ -13,20 +13,38 @@ HuggingFace에서 운영하는 Daily Paper에서는 매일 새로운 기술에 �
 - 논문 크롤링 자동화 : [HuggingFace Daily Paper](https://huggingface.co/papers) 에서 최신 논문 자동 수집
 - 내용 요약 및 번역 : 논문 초록을 간결하고 자연스러운 한국어로 요약 및 번역
 - 도메인 분류 : 논문의 주요 연구 분야를 자동 분류
-- 이메일 및 텔레그램 알림 : 요약된 논문을 이메일이나 텔레그램으로 편리하게 제공
-- 노션 DB 저장 : 노션 DB에 정리하여 쉽게 열람 및 검색 가능
+- 텔레그램 알림 : 요약된 논문을 텔레그램으로 편리하게 제공
 - 간편한 배포 및 관리 : GitHub Action의 스케줄링으로 별도의 서버 관리없이 자동 실행<br>
 
 ##### 🔄 전체 워크플로우
-![Image](https://github.com/user-attachments/assets/07ee52e9-9834-40c4-ad40-c99ba7fca866)
+```mermaid
+graph TD
+    %% Nodes
+    A[GitHub Action Schedule<br/>Mon-Fri 13:30 KST] -->|Trigger| B(main.py)
+    B --> C{crawling.py}
+    C -->|Fetch Papers| D[HuggingFace Daily Papers]
+    D -->|Return Papers| C
+    C -->|List of Papers| E{summary.py}
+    E -->|Request| F[Gemini API<br/>Gemini 2.5 Flash]
+    F -->|Summary & Domain| E
+    E -->|Summarized Data| G{telegram.py}
+    G -->|Send Message| H[Telegram Channel]
+
+    %% Styling
+    classDef trigger fill:#FF9A8B,stroke:#333,stroke-width:2px,color:black,rx:10,ry:10;
+    classDef script fill:#85FFBD,stroke:#333,stroke-width:2px,color:black,rx:5,ry:5;
+    classDef external fill:#FFCC70,stroke:#333,stroke-width:2px,color:black,rx:10,ry:10;
+    classDef output fill:#8EC5FC,stroke:#333,stroke-width:2px,color:black,rx:10,ry:10;
+
+    class A trigger;
+    class B,C,E,G script;
+    class D,F external;
+    class H output;
+```
 <br><br>
 
 ### 🛠️ 개발 스택
 🐍**언어** : Python 3.9 <br>
 ⏱️**스케줄링** : GitHub Action <br>
-🚀**추론 라이브러리** : llama-cpp-python <br>
-🤖**요약 및 번역 모델** : Qwen/Qwen3-1.7B <br>
-🤖**도메인 분류 모델** : Qwen/Qwen3-0.6B <br><br>
-
-### 🎯 향후 계획
-- 다양한 LLM 모델(ex.kanana)로 요약 및 번역 기능 고도화
+🚀**추론 라이브러리** : google-generativeai <br>
+🤖**모델** : Gemini 2.5 Flash (요약, 번역, 도메인 분류 동시 수행) <br><br>
